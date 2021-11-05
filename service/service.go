@@ -1,13 +1,12 @@
 package service
 
 import (
-    "fmt"
+	"fmt"
 	"main/sql"
 	"main/tools"
 	"strings"
 	"time"
 )
-
 
 // 针对飞书事件
 
@@ -39,28 +38,43 @@ func TaskFinish(eventJson tools.Event) {
 	var taskName string
 	var doneId string
 	alist := strings.Split(eventJson.Event.Message.Content,"\\n")
+	if len(alist)<=1 {
+		return
+	}
     taskName = alist[1][:len(alist[1])-2]
 	doneId = eventJson.Event.Sender.SenderId.OpenId
-	task := sql.FinishTask(taskName,doneId)
-    endTime := task.End
-	nowTime := time.Now()
-	tools.SendMsg(
-		tools.FinishMsg(doneId, taskName,
-			task.End.Format("2006/01/02"),
-			int((endTime.Sub(nowTime))/24)),
-		"text",task.UndoneId)
+	task,msg := sql.FinishTask(taskName,doneId)
+    if	msg == "已完成："+taskName{
+		endTime := task.End
+		nowTime := time.Now()
+		tools.SendMsg(
+			tools.FinishMsg(doneId, taskName,
+				task.End.Format("2006/01/02"),
+				int((endTime.Sub(nowTime)).Hours()/24)),
+			"card",task.UndoneId)
+		tools.SendMsg(
+			tools.FinishMsg(doneId, taskName,
+				task.End.Format("2006/01/02"),
+				int((endTime.Sub(nowTime)).Hours()/24)),
+			"card",[]string{task.SenderId})}
+	tools.SendMsg(msg,"text",[]string{doneId})
 }
 func TaskRemind(eventJson tools.Event) {
-	content := strings.Split(eventJson.Event.Message.Content,"\\n")[1]
+	alist := strings.Split(eventJson.Event.Message.Content,"\\n")
+	if len(alist)<=1 {
+		return
+	}
+	content := alist[1]
 	taskName := content[:len(content)-2]
 	senderId := eventJson.Event.Sender.SenderId.OpenId
 
 	task := sql.GetTaskInf(taskName)
 	tools.SendMsg(
 		tools.RemindMsg(senderId,taskName,
-			task.End.Format("2006/01/02 15:04"),
+			task.End.Format("2006/01/02"),
 			int(task.End.Sub(time.Now()).Hours()/24)),
 		"card",task.UndoneId)
+		tools.SendMsg("提醒已发出！","text",[]string{senderId})
 
 }
 
