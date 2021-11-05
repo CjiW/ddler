@@ -108,13 +108,23 @@ type Worker struct {
 	Status uint   `json:"status"` //0 - 未完成，1 - 已完成
 }
 
-
+type Taskforh5 struct {
+	Taskid int          `json:"taskid"`
+	Taskname string     `json:"taskname"`
+	Taskcontent string  `json:"taskcontent"`
+	Sender string       `json:"sender"`
+	Notdone []string    `json:"notdone"`
+	Done []string       `json:"done"`
+	Start string        `json:"start"`
+	Ddl string          `json:"ddl"`
+	Isdone int          `json:"isdone"`
+}
 
 type Task struct {
-	Id          uint
-	Name        string
-	Taskcontent string
-	SenderId    string
+	Id          uint       
+	Name        string     
+	Taskcontent string     
+	SenderId    string     
 	UndoneId    []string
 	DoneId      []string
 	Start       time.Time

@@ -2,15 +2,23 @@ package tools
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"main/consts"
 	"net/http"
 	"strconv"
 	"strings"
-)
 
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+func InitDB()  {
+	LocalDB,_ := gorm.Open(mysql.Open(consts.DATABASE1), &gorm.Config{})
+	consts.GlobalDB = *LocalDB
+	consts.GlobalDB.AutoMigrate(&TaskData{},&User{})
+
+}
 //GetToken 获取 token
 func GetToken(appId, appSecret string) string {
 	url := "https://open.feishu.cn/open-apis/auth/v3/app_access_token/internal/"
@@ -34,6 +42,7 @@ func GetToken(appId, appSecret string) string {
 
 }
 
+
 //SendMsg 发信息，支持text与card类型
 func SendMsg(msg, msgType string, recieverIds []string) {
 	tenantToken := GetToken(consts.APPID, consts.APPSECRET)
@@ -55,9 +64,9 @@ func SendMsg(msg, msgType string, recieverIds []string) {
 		req.Header.Add("Content-Type", "application/json; charset=utf-8")
 		//req.Header.Add("Cookie", "swp_csrf_token=e3ed77ee-471a-4166-b704-772f4625961f; t_beda37=e1f9e03bb3ba6803dc925874283ba1b50c5c3102c79baf6434076e407c708fa2")
 		{
-			a, _ := client.Do(req)
-			b, _ := ioutil.ReadAll(a.Body)
-			fmt.Print(string(b))
+			_, _ = client.Do(req)
+			// b, _ := ioutil.ReadAll(a.Body)
+			// fmt.Print(string(b))
 		}
 
 	}
@@ -115,7 +124,7 @@ func NewMsg(senderid, task, ddl string, left int) string {
 					{ 
 						"is_short": true, 
 						"text": { 
-							"content": "**任务内容：**\n` + task + `", 
+							"content": "**任务：**\n` + task + `", 
 							"tag": "lark_md" 
 						} 
 					}, 
@@ -200,7 +209,7 @@ func RemindMsg(senderid, task, ddl string, left int) string {
 	{
 	"is_short": true,
 	"text": {
-	"content": "**任务内容：**\n` + task + `",
+	"content": "**任务：**\n` + task + `",
 	"tag": "lark_md"
 	}
 	},
@@ -284,7 +293,7 @@ func FinishMsg(doneId, task, ddl string, left int) string {
         	{
          	 	"is_short": true,
           		"text": {
-            		"content": "**发布人：**\n<at id=` + doneId + `></at>",
+            		"content": "**完成人：**\n<at id=` + doneId + `></at>",
             		"tag": "lark_md"
           		}
         	},
@@ -327,8 +336,12 @@ func FinishMsg(doneId, task, ddl string, left int) string {
       		"elements": [
 			{
           		"tag": "lark_md",
-          		"content": "[任务列表](` + consts.DETAILsURL + `)"
-        	}
+          		"content": "[任务列表](` + consts.LISTURL + `)"
+        	},
+			{
+				"tag": "lark_md",
+				"content": "[任务详情](` + consts.DETAILsURL + `)"
+		  }
       		]
     	}
 		
@@ -371,5 +384,25 @@ func (data TaskData) TurnOut() Task {
 		Start:       data.Start,
 		End:         data.End,
 		Status:      data.Status,
+	}
+}
+func Cors() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		method := c.Request.Method
+		origin := c.Request.Header.Get("Origin")
+		if origin != "" {
+			// 可将 * 替换为指定的域名
+			c.Header("Access-Control-Allow-Origin", "*")
+			c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
+			c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+			c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
+			c.Header("Access-Control-Allow-Credentials", "true")
+		}
+
+		if method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+		}
+
+		c.Next()
 	}
 }
