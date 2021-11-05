@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"main/sql"
 	"main/tools"
 	"strings"
@@ -18,6 +17,7 @@ func TaskPublish(eventJson tools.Event)  {
 	}
 	publisherid = eventJson.Event.Sender.SenderId.OpenId
 	alist := strings.Split(eventJson.Event.Message.Content,"\\n")
+	if len(alist)<4 {return}
 	name = alist[2]
 	start = strings.Split(alist[3], "-")[0]
 	end = strings.Split(alist[3], "-")[1]
@@ -30,17 +30,13 @@ func TaskPublish(eventJson tools.Event)  {
 	}
 	nowTime := time.Now()
 	msg := tools.NewMsg(publisherid,name,end,int(endTime.Sub(nowTime).Hours()/24))
-	fmt.Print(len(receivers))
-    fmt.Print("\n")
     tools.SendMsg(msg,"card", receivers)
 }
 func TaskFinish(eventJson tools.Event) {
 	var taskName string
 	var doneId string
 	alist := strings.Split(eventJson.Event.Message.Content,"\\n")
-	if len(alist)<=1 {
-		return
-	}
+	if len(alist)<2 {return}
     taskName = alist[1][:len(alist[1])-2]
 	doneId = eventJson.Event.Sender.SenderId.OpenId
 	task,msg := sql.FinishTask(taskName,doneId)
@@ -61,7 +57,7 @@ func TaskFinish(eventJson tools.Event) {
 }
 func TaskRemind(eventJson tools.Event) {
 	alist := strings.Split(eventJson.Event.Message.Content,"\\n")
-	if len(alist)<=1 {
+	if len(alist)<2 {
 		return
 	}
 	content := alist[1]
