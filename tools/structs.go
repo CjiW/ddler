@@ -93,8 +93,8 @@ type User struct {
 
 
 type H5json2 struct {
-	Option      uint     `json:"option"` //0 - 提醒、1 - 修改
-	Taskid      uint     `json:"taskid"` //考虑到 任务名称 可能被修改，以 id 作为唯一标识
+	Option      int     `json:"option"` //0 - 提醒、1 - 修改
+	Taskid      int     `json:"taskid"` //考虑到 任务名称 可能被修改，以 id 作为唯一标识
 	Taskname    string   `json:"taskname"`
 	TaskContent string   `json:"taskcontent"`
 	Sender      string   `json:"sender"`
