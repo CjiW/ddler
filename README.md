@@ -6,29 +6,26 @@
 ## 项目结构
 ```
 ddler
-  |--consts
-  |    |--consts.go
-  |
-  |--router
-  |    |
-  |    |--router.go
-  |    |--api
-  |        |--api.go
-  |
-  |--service
-  |    |--service.go
-  |
-  |--tools
-  |    |--tools.go
-  |    |--structs.go
-  |
-  |--sql
-  |    |--sqltools.go
-  |
-  |--main.go
-  |
-  |--go.mod
-  |
-  |--go.sum
-
+  ├─go.mod
+  ├─go.sum
+  ├─main.go
+  │
+  ├─consts
+  │  └─consts.go
+  │
+  ├─router
+  │  ├─router.go
+  │  │
+  │  └─api
+  │     └─api.go
+  │
+  ├─service
+  │  └─service.go
+  │
+  ├─sql
+  │  └─sqltools.go
+  │
+  └─tools
+     ├─structs.go
+     └─tools.go
 ```
