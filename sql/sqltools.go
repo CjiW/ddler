@@ -147,11 +147,11 @@ func ChangeTask(json2 tools.H5json2) error {
 	var doneids []string
 	var undoneids []string
 	for _, person := range json2.Persons {
-		if person.Status == 0{undoneids = append(undoneids,person.Person)
-		}else {doneids = append(doneids,person.Person)}
+		if person.Status == 0{undoneids = append(undoneids,GetUserInf1(person.Person).OpenId)
+		}else {doneids = append(doneids,GetUserInf1(person.Person).OpenId)}
 	}
 	task := tools.Task{
-		Id:       	json2.Taskid,
+		Id:       	uint(json2.Taskid),
 		Name:     	json2.Taskname,
 		Taskcontent:json2.TaskContent,
 		SenderId:	GetUserInf1(json2.Sender).OpenId,
