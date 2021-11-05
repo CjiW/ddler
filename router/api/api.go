@@ -38,7 +38,7 @@ func HandleH5get(ctx *gin.Context)  {
 	consts.GlobalDB.Find(&taskdatas)
 	for _, taskdata := range taskdatas {
 		task := taskdata.TurnOut()
-		fmt.Print(task)
+		fmt.Print(task,"\n")
 		done := []string{}
 		for _, id := range task.DoneId {
 			name :=sql.GetUserInf2(id).Name
