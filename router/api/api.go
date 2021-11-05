@@ -23,11 +23,11 @@ func HandleMsg(ctx *gin.Context)  {
 	str := strconv.Quote(eventJson.Event.Message.Content)
 	str = str[13:len(str)-4]
 	func (str string){
-		isMatch,_ := regexp.MatchString(`^(【任务发布】)*`, str)
+		isMatch,_ := regexp.MatchString(`^【任务发布】*`, str)
 		if isMatch {service.TaskPublish(eventJson)}
-		isMatch,_ = regexp.MatchString(`^(【任务完成】)*`, str)
+		isMatch,_ = regexp.MatchString(`^【任务完成】*`, str)
 		if isMatch {service.TaskFinish(eventJson)}
-		isMatch,_ = regexp.MatchString(`^(【任务提醒】)*`, str)
+		isMatch,_ = regexp.MatchString(`^【任务提醒】*`, str)
 		if isMatch {service.TaskRemind(eventJson)}}(str)
 
 }
@@ -75,10 +75,10 @@ func HandleH5get(ctx *gin.Context)  {
 func HandleH5post(ctx *gin.Context) {
 	var jsonData tools.H5json2
 	_ = ctx.ShouldBindJSON(&jsonData)
-	fmt.Print(jsonData)
+	fmt.Print(jsonData,"\n")
 	switch jsonData.Option {
 	case 0:
-		err := sql.Remind(jsonData.Taskid)
+		err := sql.Remind(uint(jsonData.Taskid))
 		if err != nil {
 			ctx.JSON(200,gin.H{"msg":err.Error()})
 			return
