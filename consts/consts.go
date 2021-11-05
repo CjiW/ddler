@@ -10,6 +10,6 @@ var (
 	LISTURL         = "https://www.baidu.com/"
 	DATABASE1       = "root:xxx@tcp(127.0.0.1:3306)/tasks?parseTime=true&loc=Local&charset=utf8mb4"
 	DATABASE2       = "root:xxx@tcp(127.0.0.1:3306)/users?parseTime=true&loc=Local"
-
+	GlobalDB        gorm.DB
  	AUTOTIME        = "0 9,21 * * *"
 )
